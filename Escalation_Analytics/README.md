@@ -1,7 +1,7 @@
 # Escalation Analytics Pipeline
 
 ## Problem Context
-Decision‑making for escalations is distorted because all case‑to‑ticket resolution latency is currently attributed to the final EscOps ticket owner, masking delays introduced by Dev_teams routing, reassignment, and inactivity. We need an ESC data warehouse (Bronze/Silver/Gold) that reconstructs ticket ownership timelines from audit logs, decomposes latency by Dev_teams, quantifies routing “bounce,” and exposes real‑time views of active escalations so accountability and process improvements target the true sources of delay.
+Escalation performance metrics were previously computed using final ticket ownership attribution, which obscured intermediate routing delays and reassignment latency. This project demonstrates an analytics warehouse pipeline that reconstructs ticket ownership timelines from audit logs, decomposes latency by assignment group, quantifies routing “bounce,” and exposes near-real-time escalation state for more accurate operational analysis.
 
 ## Architectural Overview
 - Event-driven daily pipeline (01:00) — EventBridge schedule triggers a Lambda to run unload SQL, write datasets to S3 with a ready-key marker.
@@ -10,9 +10,9 @@ Decision‑making for escalations is distorted because all case‑to‑ticket re
 - Analytics: QuickSight dashboards read the Gold views for ownership timelines, bounce counts, workload, and agent aggregates.
 - Diagrams: Mermaid dataflow and per-view lineage diagrams illustrate the end-to-end flow.
 - Operations: Daily cadence with next-day freshness; recommended alerting via CloudWatch/SNS for Step Functions failures or missed runs.
-
-## My role
-This entire process and components were developed solely by me based on personally derived goals and identified gaps in metrics calculations for determination of latency contributors.
+- 
+## My Role
+I designed and implemented the pipeline architecture, unload orchestration, catalog refresh flow, Redshift mart refresh procedures, and consumer analytics views to address identified gaps in escalation latency measurement and attribution.
 
 ## Flow
 1) **Unload**: EventBridge schedule (01:00) triggers Lambda dwunloader.py to unload source data to S3 and drop a readykey marker.
