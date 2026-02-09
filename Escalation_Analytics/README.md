@@ -1,17 +1,17 @@
 # Escalation Analytics Pipeline
 
 ## Problem Context
-Escalation performance metrics were previously computed using final ticket ownership attribution, which obscured intermediate routing delays and reassignment latency. This project demonstrates an analytics warehouse pipeline that reconstructs ticket ownership timelines from audit logs, decomposes latency by assignment group, quantifies routing “bounce,” and exposes near-real-time escalation state for more accurate operational analysis.
+Escalation performance metrics were historically computed using final ticket ownership attribution, which obscured intermediate routing delays, reassignment latency, and inactivity gaps. This project demonstrates an analytics warehouse pipeline that reconstructs ticket ownership timelines from audit logs, decomposes latency by assignment group, quantifies routing “bounce,” and exposes daily-refreshed escalation state to support more accurate operational analysis and process improvement.
 
 ## Architectural Overview
 - Event-driven daily pipeline (01:00) — EventBridge schedule triggers a Lambda to run unload SQL, write datasets to S3 with a ready-key marker.
-- Ready-key event starts a Step Functions state machine; it runs a Glue crawler to refresh the catalog, then calls Redshift public.sp_datarefresh() via Redshift Data API; IAM policies cover Step Functions and Redshift calls.
+- Ready-key event starts a Step Functions state machine; it runs a Glue crawler to refresh the catalog, then calls Redshift public.sp_datarefresh() via the Redshift Data API; IAM policies cover Step Functions and Redshift calls.
 - Medallion model: Bronze = external tables over S3 unloads; Silver = core Redshift tables in esc_ops schema loaded by stored procedures; Gold = consumer-facing views in public schema for analytics.
 - Analytics: QuickSight dashboards read the Gold views for ownership timelines, bounce counts, workload, and agent aggregates.
 - Diagrams: Mermaid dataflow and per-view lineage diagrams illustrate the end-to-end flow.
 - Operations: Daily cadence with next-day freshness; recommended alerting via CloudWatch/SNS for Step Functions failures or missed runs.
 
-- ## Technical Highlights
+## Technical Highlights
 - Event-driven warehouse refresh orchestration using EventBridge and Step Functions
 - Automated Redshift mart refresh via stored procedures and Data API
 - Audit-log reconstruction logic for ownership timeline derivation
