@@ -10,7 +10,15 @@ Escalation performance metrics were previously computed using final ticket owner
 - Analytics: QuickSight dashboards read the Gold views for ownership timelines, bounce counts, workload, and agent aggregates.
 - Diagrams: Mermaid dataflow and per-view lineage diagrams illustrate the end-to-end flow.
 - Operations: Daily cadence with next-day freshness; recommended alerting via CloudWatch/SNS for Step Functions failures or missed runs.
-- 
+
+- ## Technical Highlights
+- Event-driven warehouse refresh orchestration using EventBridge and Step Functions
+- Automated Redshift mart refresh via stored procedures and Data API
+- Audit-log reconstruction logic for ownership timeline derivation
+- Medallion-style warehouse layering (Bronze/Silver/Gold)
+- Consumer analytics views supporting latency decomposition and routing analysis
+- End-to-end lineage documentation using Mermaid diagrams
+
 ## My Role
 I designed and implemented the pipeline architecture, unload orchestration, catalog refresh flow, Redshift mart refresh procedures, and consumer analytics views to address identified gaps in escalation latency measurement and attribution.
 
