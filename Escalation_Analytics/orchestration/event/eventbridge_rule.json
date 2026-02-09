@@ -1,0 +1,12 @@
+{
+  "Name": "s3-readykey-object-created",
+  "EventPattern": {
+    "source": ["aws.s3"],
+    "detail-type": ["Object Created"],
+    "detail": {
+      "bucket": { "name": ["example-escalation-data"] },
+      "object": { "key": [{ "suffix": "readykey" }] }
+    }
+  },
+  "State": "ENABLED"
+}

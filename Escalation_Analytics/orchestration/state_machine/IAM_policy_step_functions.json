@@ -1,0 +1,10 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow", "Action": ["glue:StartCrawler", "glue:GetCrawler"], "Resource": "arn:aws:glue:us-east-1:ACCOUNT_ID:crawler/DWCrawler" },
+    { "Effect": "Allow", "Action": ["redshift-data:ExecuteStatement", "redshift-data:DescribeStatement", "redshift-data:GetStatementResult"], "Resource": "*" },
+    { "Effect": "Allow", "Action": "secretsmanager:GetSecretValue", "Resource": "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:redshift/esc" },
+    { "Effect": "Allow", "Action": "s3:DeleteObject", "Resource": "arn:aws:s3:::example-escalation-data/readykey" },
+    { "Effect": "Allow", "Action": "sns:Publish", "Resource": "arn:aws:sns:us-east-1:ACCOUNT_ID:esc-pipeline-alerts" }
+  ]
+}

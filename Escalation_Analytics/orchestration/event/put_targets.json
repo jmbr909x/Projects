@@ -1,0 +1,11 @@
+{
+  "Rule": "s3-readykey-object-created",
+  "Targets": [
+    {
+      "Id": "StartStateMachine",
+      "Arn": "arn:aws:states:us-east-1:ACCOUNT_ID:stateMachine:EscalationPipeline",
+      "RoleArn": "arn:aws:iam::ACCOUNT_ID:role/readykey-eventbridge-target",
+      "InputPath": "$.detail"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+flowchart TD
+    subgraph "Unload & Marker"
+        L["Lambda: dwunloader.py<br/>runs unload SQL via Redshift Data API"] --> M["s3://example-escalation-data/readykey<br/>marker object"]
+    end
+
+    subgraph "Event & Orchestration"
+        M --> EB["EventBridge rule<br/>filter key=readykey"]
+        EB --> SF["Step Functions execution"]
+    end
+
+    subgraph "Processing & Refresh"
+        SF --> G["Glue Crawler DWCrawler<br/>catalog staged unload outputs"]
+        G -->|READY| R["Redshift Data API<br/>CALL public.sp_datarefresh()"]
+    end
+
+    R --> C["S3 delete readykey<br/>(optional cleanup)"]
+
+    G -->|FAILED| FG["Fail: Crawler error"]
+    R -->|FAILED/ABORTED| FR["Fail: Redshift error"]
+
+    C --> S["Success"]

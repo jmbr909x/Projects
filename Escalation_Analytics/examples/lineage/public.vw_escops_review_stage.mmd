@@ -1,0 +1,28 @@
+%%{init: {'flowchart': {'curve': 'basis', 'nodeSpacing': 110, 'rankSpacing': 170, 'padding': 20}}}%%
+flowchart LR
+  public_vw_escops_review_stage_title([ public.vw_escops_review_stage ])
+  anchor_ext([ ])
+  anchor_view([ ])
+  subgraph EXT_SRC [ext_src]
+    direction TB
+    ext_src_remedy_esc_audittrail[ext_src.remedy_esc_audittrail]
+    ext_src_remedy_esc_tickets[ext_src.remedy_esc_tickets]
+  end
+  subgraph VIEWS [views]
+    direction TB
+    public_vw_escops_review_stage[public.vw_escops_review_stage]
+  end
+  ext_src_remedy_esc_tickets --> public_vw_escops_review_stage
+  ext_src_remedy_esc_audittrail --> public_vw_escops_review_stage
+  classDef view fill:#d0e8ff,stroke:#1a73e8,stroke-width:1.5px,color:#000,font-weight:700;
+  classDef table fill:#e8f5e9,stroke:#2e7d32,stroke-width:1.2px,color:#000,font-weight:700;
+  classDef sp fill:#ffe0b2,stroke:#ef6c00,stroke-width:1.2px,color:#000,font-weight:700;
+  classDef ext fill:#f3e5f5,stroke:#6a1b9a,stroke-width:1.2px,color:#000,font-weight:700;
+  classDef hidden fill:transparent,stroke:transparent;
+  classDef title fill:transparent,stroke:transparent,font-size:20px,font-weight:800;
+  class public_vw_escops_review_stage view
+  class ext_src_remedy_esc_audittrail,ext_src_remedy_esc_tickets ext
+  class anchor_ext,anchor_view hidden
+  class public_vw_escops_review_stage_title title
+  linkStyle 0 stroke:#9e9e9e,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 1 stroke:#9e9e9e,stroke-width:1.5px,stroke-opacity:0.8;

@@ -1,0 +1,97 @@
+{
+  "Comment": "Ready-key triggers Glue crawler then Redshift refresh",
+  "StartAt": "StartCrawler",
+  "States": {
+    "StartCrawler": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+      "Parameters": { "Name": "DWCrawler" },
+      "Next": "WaitCrawler"
+    },
+    "WaitCrawler": { "Type": "Wait", "Seconds": 30, "Next": "GetCrawler" },
+    "GetCrawler": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:getCrawler",
+      "Parameters": {
+        "Name": "DWCrawler"
+      },
+      "ResultPath": "$.Crawler",
+      "Next": "CrawlerStatus"
+    },
+    "CrawlerStatus": {
+      "Type": "Choice",
+      "Choices": [
+        { "Variable": "$.Crawler.State", "StringEquals": "READY", "Next": "CheckCrawlFreshness" },
+        { "Variable": "$.Crawler.State", "StringEquals": "RUNNING", "Next": "WaitCrawler" }
+      ],
+      "Default": "WaitCrawler"
+    },
+    "CheckCrawlFreshness": {
+      "Type": "Choice",
+      "Choices": [
+        { "Variable": "$.Crawler.LastCrawl.Status", "StringEquals": "SUCCEEDED", "Next": "CallRefresh" },
+        { "Variable": "$.Crawler.LastCrawl.Status", "StringEquals": "FAILED", "Next": "NotifyGlueFailure" }
+      ],
+      "Default": "WaitCrawler"
+    },
+    "CallRefresh": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:redshiftdata:executeStatement",
+      "Parameters": {
+        "Database": "analyticsdb",
+        "SecretArn": "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:redshift/esc",
+        "Sql": "CALL public.sp_datarefresh();",
+        "ClusterIdentifier": "example-redshift-cluster"
+      },
+      "Next": "WaitStmt"
+    },
+    "WaitStmt": { "Type": "Wait", "Seconds": 10, "Next": "GetStmt" },
+    "GetStmt": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:redshiftdata:describeStatement",
+      "Parameters": { "Id.$": "$.Id" },
+      "ResultPath": "$.Stmt",
+      "Next": "StmtStatus"
+    },
+    "StmtStatus": {
+      "Type": "Choice",
+      "Choices": [
+        { "Variable": "$.Stmt.Status", "StringEquals": "FINISHED", "Next": "CleanupMarker" },
+        { "Variable": "$.Stmt.Status", "StringEquals": "FAILED", "Next": "NotifyRedshiftFailure" },
+        { "Variable": "$.Stmt.Status", "StringEquals": "ABORTED", "Next": "NotifyRedshiftFailure" }
+      ],
+      "Default": "WaitStmt"
+    },
+    "CleanupMarker": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Parameters": { "Bucket": "example-escalation-data", "Key": "readykey" },
+      "Next": "Success"
+    },
+    "Success": { "Type": "Succeed" },
+
+    "NotifyGlueFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:ACCOUNT_ID:esc-pipeline-alerts",
+        "Subject": "Glue crawler failure in readykey pipeline",
+        "Message.$": "States.Format('Glue crawler {} failed for bucket {} key readykey. Last status: {}', 'DWCrawler', 'example-escalation-data', $.Crawler.LastCrawl.Status)"
+      },
+      "Next": "FailOnGlue"
+    },
+    "NotifyRedshiftFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:ACCOUNT_ID:esc-pipeline-alerts",
+        "Subject": "Redshift refresh failure in readykey pipeline",
+        "Message.$": "States.Format('Redshift refresh failed. Statement status: {}  Id: {}', $.Stmt.Status, $.Stmt.Id)"
+      },
+      "Next": "FailOnRedshift"
+    },
+
+    "FailOnGlue": { "Type": "Fail", "Error": "GlueJobFailed" },
+    "FailOnRedshift": { "Type": "Fail", "Error": "RedshiftStatementFailed" }
+  }
+}

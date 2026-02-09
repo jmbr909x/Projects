@@ -1,0 +1,66 @@
+%%{init: {'flowchart': {'curve': 'basis', 'nodeSpacing': 110, 'rankSpacing': 170, 'padding': 20}}}%%
+flowchart LR
+  public_vw_ticket_aging_detail_title([ public.vw_ticket_aging_detail ])
+  anchor_ext([ ])
+  anchor_sp([ ])
+  anchor_tbl([ ])
+  anchor_view([ ])
+  anchor_ext --- anchor_sp
+  anchor_sp --- anchor_tbl
+  anchor_tbl --- anchor_view
+  subgraph EXT_SRC [ext_src]
+    direction TB
+    ext_src_case_remedy_esc_tickets[ext_src.case_remedy_esc_tickets]
+    ext_src_remedy_esc_audittrail[ext_src.remedy_esc_audittrail]
+    ext_src_remedy_esc_tickets[ext_src.remedy_esc_tickets]
+  end
+  subgraph STORED_PROCS [stored procs]
+    direction TB
+    public_sp_crosswalk[public.sp_crosswalk]
+    public_sp_remedy_esc_audittrail[public.sp_remedy_esc_audittrail]
+    public_sp_remedy_esc_tickets[public.sp_remedy_esc_tickets]
+  end
+  subgraph ESC_OPS [esc_ops tables]
+    direction TB
+    esc_ops_crosswalk[esc_ops.crosswalk]
+    esc_ops_remedy_esc_audittrail[esc_ops.remedy_esc_audittrail]
+    esc_ops_remedy_esc_tickets[esc_ops.remedy_esc_tickets]
+  end
+  subgraph VIEWS [views]
+    direction TB
+    public_vw_ticket_aging_detail[public.vw_ticket_aging_detail]
+  end
+  esc_ops_crosswalk --> public_vw_ticket_aging_detail
+  esc_ops_remedy_esc_tickets --> public_vw_ticket_aging_detail
+  public_sp_remedy_esc_tickets --> esc_ops_remedy_esc_tickets
+  ext_src_remedy_esc_audittrail --> public_sp_remedy_esc_audittrail
+  public_sp_crosswalk --> esc_ops_crosswalk
+  ext_src_remedy_esc_tickets --> public_sp_remedy_esc_tickets
+  ext_src_remedy_esc_tickets --> public_sp_crosswalk
+  ext_src_remedy_esc_audittrail --> public_sp_crosswalk
+  esc_ops_remedy_esc_audittrail --> public_vw_ticket_aging_detail
+  public_sp_remedy_esc_audittrail --> esc_ops_remedy_esc_audittrail
+  ext_src_case_remedy_esc_tickets --> public_sp_crosswalk
+  classDef view fill:#d0e8ff,stroke:#1a73e8,stroke-width:1.5px,color:#000,font-weight:700;
+  classDef table fill:#e8f5e9,stroke:#2e7d32,stroke-width:1.2px,color:#000,font-weight:700;
+  classDef sp fill:#ffe0b2,stroke:#ef6c00,stroke-width:1.2px,color:#000,font-weight:700;
+  classDef ext fill:#f3e5f5,stroke:#6a1b9a,stroke-width:1.2px,color:#000,font-weight:700;
+  classDef hidden fill:transparent,stroke:transparent;
+  classDef title fill:transparent,stroke:transparent,font-size:20px,font-weight:800;
+  class public_vw_ticket_aging_detail view
+  class esc_ops_crosswalk,esc_ops_remedy_esc_tickets,esc_ops_remedy_esc_audittrail table
+  class public_sp_remedy_esc_tickets,public_sp_crosswalk,public_sp_remedy_esc_audittrail sp
+  class ext_src_remedy_esc_audittrail,ext_src_remedy_esc_tickets,ext_src_case_remedy_esc_tickets ext
+  class anchor_ext,anchor_sp,anchor_tbl,anchor_view hidden
+  class public_vw_ticket_aging_detail_title title
+  linkStyle 0 stroke:#81c784,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 1 stroke:#81c784,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 2 stroke:#ffb74d,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 3 stroke:#b39ddb,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 4 stroke:#ffb74d,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 5 stroke:#b39ddb,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 6 stroke:#b39ddb,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 7 stroke:#b39ddb,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 8 stroke:#81c784,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 9 stroke:#ffb74d,stroke-width:1.5px,stroke-opacity:0.8;
+  linkStyle 10 stroke:#b39ddb,stroke-width:1.5px,stroke-opacity:0.8;
