@@ -10,13 +10,13 @@ Event-driven pipeline that unloads Remedy escalation data to S3, processes it vi
 5) **Consume**: QuickSight dashboards read from public views; key metrics include bounce counts, team ownership timeframes, and agent aggregates.
 
 ## Repository map
-- data_sources.md ? source systems and unload definitions.
-- ingestion/ ? S3 unload SQL and external table DDL; Lambda unloader.
-- storage/ ? core Redshift tables (esc_ops).
-- 	ransformations/ ? stored procedures (refresh logic) and consumer-facing views.
-- orchestration/ ? EventBridge, Step Functions, Glue crawler, Redshift Data API assets.
-- examples/ ? lineage diagrams
-- docs/ ? dataflow diagram.
+- data_sources.md  source systems and unload definitions.
+- ingestion/  S3 unload SQL and external table DDL; Lambda unloader.
+- storage/  core Redshift tables (esc_ops).
+- Transformations/  stored procedures (refresh logic) and consumer-facing views.
+- orchestration/  EventBridge, Step Functions, Glue crawler, Redshift Data API assets.
+- lineage diagrams/  illustrated dataflow lineage
+- docs/  dataflow diagram and medallion breakout
 
 
 Identifiers use anonymized example values; Account ID and Redshift CLUSTER_ID are intentionally excluded for security of owning systems.
